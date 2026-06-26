@@ -1,5 +1,6 @@
 using MonolitoModular.Creditos.Application.DTOs;
 using MonolitoModular.Creditos.Domain.Entities;
+using MonolitoModular.Creditos.Domain.ExternalServices;
 using MonolitoModular.Creditos.Domain.Repositories;
 
 namespace MonolitoModular.Creditos.Application.Services;
@@ -7,10 +8,12 @@ namespace MonolitoModular.Creditos.Application.Services;
 public class CreditoService : ICreditoService
 {
     private readonly ICreditoRepository _repository;
+    private readonly IBureauCreditoService _bureauService;
 
-    public CreditoService(ICreditoRepository repository)
+    public CreditoService(ICreditoRepository repository, IBureauCreditoService bureauService)
     {
         _repository = repository;
+        _bureauService = bureauService;
     }
 
     public async Task<CreditoDto?> ObtenerPorIdAsync(Guid id)
@@ -33,7 +36,21 @@ public class CreditoService : ICreditoService
 
     public async Task<CreditoDto> SolicitarAsync(SolicitarCreditoDto dto)
     {
-        var credito = new Credito(Guid.NewGuid(), dto.ClienteId, dto.Monto, dto.TasaInteres, dto.PlazoEnMeses);
+        // Consulta el score crediticio al buró externo.
+        // Si el buró está caído, el Circuit Breaker devuelve un score de fallback local
+        // sin lanzar excepción — la solicitud nunca falla por culpa del externo.
+        var resultado = await _bureauService.ConsultarScoreAsync(dto.ClienteId, dto.Monto);
+
+        var credito = new Credito(
+            id:           Guid.NewGuid(),
+            clienteId:    dto.ClienteId,
+            monto:        dto.Monto,
+            tasaInteres:  dto.TasaInteres,
+            plazoEnMeses: dto.PlazoEnMeses,
+            scoreCredito: resultado.Score,
+            fuenteScore:  resultado.Fuente.ToString()
+        );
+
         await _repository.AgregarAsync(credito);
         return MapToDto(credito);
     }
@@ -75,5 +92,6 @@ public class CreditoService : ICreditoService
     }
 
     private static CreditoDto MapToDto(Credito c) =>
-        new(c.Id, c.ClienteId, c.Monto, c.TasaInteres, c.PlazoEnMeses, c.Estado.ToString(), c.FechaSolicitud);
+        new(c.Id, c.ClienteId, c.Monto, c.TasaInteres, c.PlazoEnMeses,
+            c.Estado.ToString(), c.FechaSolicitud, c.ScoreCredito, c.FuenteScore);
 }

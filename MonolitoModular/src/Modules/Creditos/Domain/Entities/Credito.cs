@@ -20,12 +20,26 @@ public class Credito : Entity<Guid>
     public EstadoCredito Estado { get; private set; }
     public DateTime FechaSolicitud { get; private set; }
 
+    /// <summary>
+    /// Score crediticio en escala 0–1000 obtenido al momento de la solicitud.
+    /// 0 indica que el crédito fue creado sin consulta al buró (datos semilla).
+    /// </summary>
+    public int ScoreCredito { get; private set; }
+
+    /// <summary>
+    /// Origen del score: "BureauExterno", "FallbackLocal" o "SinEvaluar" (datos semilla).
+    /// </summary>
+    public string FuenteScore { get; private set; } = "SinEvaluar";
+
     private Credito() : base()
     {
         // Para deserialización
     }
 
-    public Credito(Guid id, Guid clienteId, decimal monto, decimal tasaInteres, int plazoEnMeses)
+    /// <param name="scoreCredito">Score del buró. Default 0 para datos semilla.</param>
+    /// <param name="fuenteScore">Origen del score. Default "SinEvaluar" para datos semilla.</param>
+    public Credito(Guid id, Guid clienteId, decimal monto, decimal tasaInteres, int plazoEnMeses,
+                   int scoreCredito = 0, string fuenteScore = "SinEvaluar")
         : base(id)
     {
         ClienteId = clienteId;
@@ -34,6 +48,8 @@ public class Credito : Entity<Guid>
         PlazoEnMeses = plazoEnMeses;
         Estado = EstadoCredito.Solicitado;
         FechaSolicitud = DateTime.UtcNow;
+        ScoreCredito = scoreCredito;
+        FuenteScore = fuenteScore;
     }
 
     public void Aprobar()

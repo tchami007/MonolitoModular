@@ -9,7 +9,9 @@ public record CreditoDto(
     decimal TasaInteres,
     int PlazoEnMeses,
     string Estado,
-    DateTime FechaSolicitud
+    DateTime FechaSolicitud,
+    int ScoreCredito,
+    string FuenteScore
 );
 
 public record SolicitarCreditoDto(
