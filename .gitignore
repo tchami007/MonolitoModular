@@ -70,3 +70,6 @@ secrets.json
 
 # PDF binaries (keep .md docs, ignore binary exports)
 docs/*.pdf
+
+# Documentacion clasificada — solo local, nunca subir
+docs/no_subir/
