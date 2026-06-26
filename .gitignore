@@ -1,0 +1,72 @@
+# ============================================================
+#  .gitignore — MonolitoModular (.NET 8 / C#)
+# ============================================================
+
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+out/
+publish/
+
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+*.DotSettings.user
+
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/repositories.config
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# dotnet tool manifest (keep if present, ignore local restore)
+.config/dotnet-tools.json
+
+# MSBuild / Roslyn
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+GeneratedFiles/
+
+# Runtime / OS
+*.log
+*.tmp
+*.temp
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Test results
+TestResults/
+coverage/
+*.trx
+*.coveragexml
+*.coverage
+
+# Secrets / environment
+*.env
+*.env.local
+appsettings.Production.json
+appsettings.Secrets.json
+secrets.json
+
+# PDF binaries (keep .md docs, ignore binary exports)
+docs/*.pdf
